@@ -6,22 +6,13 @@ return {
     end,
   },
   {
-    "williamboman/mason-lspconfig.nvim",
-    config = function()
-      require("mason-lspconfig").setup({
-        ensure_installed = { "ts_ls", "gopls" },
-      })
-    end,
-  },
-  {
-    "neovim/nvim-lspconfig",
+    "hrsh7th/cmp-nvim-lsp",
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
-      local lspconfig = require("lspconfig")
-      lspconfig.ts_ls.setup({
+      vim.lsp.config.ts_ls = {
         capabilities = capabilities,
-      })
-      lspconfig.gopls.setup({
+      }
+      vim.lsp.config.gopls = {
         capabilities = capabilities,
         filetypes = { "go", "gomod", "gowork", "gotmpl" },
         settings = {
@@ -33,10 +24,16 @@ return {
             },
           },
         },
-      })
-      lspconfig.dockerls.setup({
+      }
+      vim.lsp.config.sqls = {
         capabilities = capabilities,
-      })
+        filetypes = { "sql" },
+      }
+
+      -- Enable the configs
+      vim.lsp.enable(vim.lsp.config.ts_ls)
+      vim.lsp.enable(vim.lsp.config.gopls)
+      vim.lsp.enable(vim.lsp.config.sqls)
 
       -- Global mappings.
       -- See `:help vim.diagnostic.*` for documentation on any of the below functions
