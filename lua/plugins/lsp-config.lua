@@ -1,39 +1,42 @@
 return {
   {
-    "williamboman/mason.nvim",
-    config = function()
-      require("mason").setup()
-    end,
+    "mason-org/mason.nvim",
+    opts = {},
   },
   {
-    "hrsh7th/cmp-nvim-lsp",
+    "mason-org/mason-lspconfig.nvim",
+    opts = {
+      ensure_installed = { "ts_ls", "gopls", "sqls", "yamlls" },
+    },
+    dependencies = {
+      "mason-org/mason.nvim",
+      "neovim/nvim-lspconfig",
+    },
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
-      vim.lsp.config.ts_ls = {
-        capabilities = capabilities,
-      }
+
+      -- Enable each server with default configs
+      for _, server in ipairs({ "ts_ls", "gopls", "sqls", "yamlls" }) do
+        vim.lsp.config[server] = { capabilities = capabilities }
+        vim.lsp.enable(server)
+      end
+
+      -- Override gopls configs
       vim.lsp.config.gopls = {
         capabilities = capabilities,
         filetypes = { "go", "gomod", "gowork", "gotmpl" },
+        root_dir = vim.fs.root(0, { "go.mod" }),
         settings = {
           gopls = {
-            completeUnimported = true,
-            usePlaceholders = false,
             analyses = {
-              unusedparams = true,
+              unusedparams = true
             },
+            completeUnimported = true,
+            staticcheck = true,
+            usePlaceholders = false,
           },
         },
       }
-      vim.lsp.config.sqls = {
-        capabilities = capabilities,
-        filetypes = { "sql" },
-      }
-
-      -- Enable the configs
-      vim.lsp.enable(vim.lsp.config.ts_ls)
-      vim.lsp.enable(vim.lsp.config.gopls)
-      vim.lsp.enable(vim.lsp.config.sqls)
 
       -- Global mappings.
       -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -65,5 +68,5 @@ return {
         end,
       })
     end,
-  },
+    }
 }
